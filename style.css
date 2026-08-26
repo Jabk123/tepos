@@ -1,0 +1,51 @@
+/* ── style.css – Technopaths Quota ── */
+:root {
+  --primary: #2C3E50;
+  --accent: #3498DB;
+  --success: #27AE60;
+  --bg-light: #f4f6f9;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-light);
+}
+.bg-primary-custom {
+  background: var(--primary) !important;
+}
+.bg-accent {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: #2980b9;
+  color: #fff;
+}
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.stat-card {
+  border-radius: 16px;
+  transition: transform 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+.stat-icon {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.table th {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+@media print {
+  .navbar, #backBtn, #printBtn, #pdfBtn, .no-print { display: none !important; }
+  .print-area { padding: 20px; }
+  body { background: #fff; }
+}
