@@ -1,108 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang=en>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard – Technopaths Quota</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset=UTF-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Dashboard – Technopaths Quota</title>
+<link href=https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css rel=stylesheet>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel=stylesheet>
+<link rel=stylesheet href=style.css>
 </head>
-<body data-page="dashboard">
-
-  <div id="tqNav"></div>
-
-  <div class="tq-main">
-    <!-- Welcome -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><i class="bi bi-person-circle me-2"></i>Welcome, <span id="usernameDisplay">User</span>!</h2>
-      <span class="badge bg-accent py-2 px-3">Technopaths Entity</span>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4" id="statsCards">
-      <div class="col-md-3 col-6">
-        <div class="card stat-card border-0 shadow-sm">
-          <div class="card-body">
-            <div class="stat-icon"><i class="bi bi-file-text"></i></div>
-            <h5 class="card-title">Total Quotes</h5>
-            <p class="card-text display-6 fw-bold" id="totalQuotes">0</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="card stat-card border-0 shadow-sm">
-          <div class="card-body">
-            <div class="stat-icon"><i class="bi bi-people"></i></div>
-            <h5 class="card-title">Clients</h5>
-            <p class="card-text display-6 fw-bold" id="totalClients">0</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="card stat-card border-0 shadow-sm">
-          <div class="card-body">
-            <div class="stat-icon"><i class="bi bi-calendar-exclamation"></i></div>
-            <h5 class="card-title">Expiring This Week</h5>
-            <p class="card-text display-6 fw-bold" id="expiringCount">0</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="card stat-card border-0 shadow-sm">
-          <div class="card-body">
-            <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
-            <h5 class="card-title">Total Revenue</h5>
-            <p class="card-text display-6 fw-bold" id="totalRevenue">$0</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row g-3 mb-4">
-      <div class="col-12 col-md-6">
-        <a href="create-quote.html" class="btn btn-accent w-100 py-3"><i class="bi bi-plus-circle me-2"></i>Create New Quotation</a>
-      </div>
-      <div class="col-12 col-md-6">
-        <a href="view-quotes.html" class="btn btn-outline-primary w-100 py-3"><i class="bi bi-list-ul me-2"></i>View All Quotations</a>
-      </div>
-    </div>
-
-    <!-- Recent Quotations Table -->
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-white fw-bold"><i class="bi bi-clock-history me-2"></i>Recent Quotations</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0" id="recentTable">
-            <thead>
-              <tr>
-                <th>Quote #</th>
-                <th>Client</th>
-                <th>Service</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="recentTableBody">
-              <tr><td colspan="6" class="text-center py-4 text-muted">Loading…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="config.js"></script>
-  <script src="script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      checkAuth();
-      loadDashboard();
-    });
-  </script>
+<body data-page=dashboard>
+<div id=tqNav></div>
+<div class=tq-main>
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h2><i class="bi bi-person-circle me-2"></i>Welcome, <span id=usernameDisplay>User</span>!</h2>
+<span class="badge bg-accent py-2 px-3">Technopaths Entity</span>
+</div>
+<div class="row g-3 mb-4" id=statsCards>
+<div class="col-md-3 col-6">
+<div class="card stat-card border-0 shadow-sm">
+<div class=card-body>
+<div class=stat-icon><i class="bi bi-file-text"></i></div>
+<h5 class=card-title>Total Quotes</h5>
+<p class="card-text display-6 fw-bold" id=totalQuotes>0</p>
+</div>
+</div>
+</div>
+<div class="col-md-3 col-6">
+<div class="card stat-card border-0 shadow-sm">
+<div class=card-body>
+<div class=stat-icon><i class="bi bi-people"></i></div>
+<h5 class=card-title>Clients</h5>
+<p class="card-text display-6 fw-bold" id=totalClients>0</p>
+</div>
+</div>
+</div>
+<div class="col-md-3 col-6">
+<div class="card stat-card border-0 shadow-sm">
+<div class=card-body>
+<div class=stat-icon><i class="bi bi-calendar-exclamation"></i></div>
+<h5 class=card-title>Expiring This Week</h5>
+<p class="card-text display-6 fw-bold" id=expiringCount>0</p>
+</div>
+</div>
+</div>
+<div class="col-md-3 col-6">
+<div class="card stat-card border-0 shadow-sm">
+<div class=card-body>
+<div class=stat-icon><i class="bi bi-currency-dollar"></i></div>
+<h5 class=card-title>Total Revenue</h5>
+<p class="card-text display-6 fw-bold" id=totalRevenue>$0</p>
+</div>
+</div>
+</div>
+</div>
+<div class="row g-3 mb-4">
+<div class="col-12 col-md-6">
+<a href=create-quote.html class="btn btn-accent w-100 py-3"><i class="bi bi-plus-circle me-2"></i>Create New Quotation</a>
+</div>
+<div class="col-12 col-md-6">
+<a href=view-quotes.html class="btn btn-outline-primary w-100 py-3"><i class="bi bi-list-ul me-2"></i>View All Quotations</a>
+</div>
+</div>
+<div class="card shadow-sm border-0">
+<div class="card-header bg-white fw-bold"><i class="bi bi-clock-history me-2"></i>Recent Quotations</div>
+<div class="card-body p-0">
+<div class=table-responsive>
+<table class="table table-hover mb-0" id=recentTable>
+<thead>
+<tr>
+<th>Quote #</th>
+<th>Client</th>
+<th>Service</th>
+<th>Date</th>
+<th>Total</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id=recentTableBody>
+<tr><td colspan=6 class="text-center py-4 text-muted">Loading…</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<script src=https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js></script>
+<script src=config.js></script>
+<script src=script.js></script>
+<script>document.addEventListener("DOMContentLoaded",(function(){checkAuth(),loadDashboard()}))</script>
 </body>
 </html>
