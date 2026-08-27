@@ -44,73 +44,9 @@
         </div>
     </div>
 
-    <script>
-        // ──────────────────────────────────────────────────────
-        // TEMPORARY hardcoded auth. Values documented in .env.example
-        // under LOGIN_USERNAME / LOGIN_PASSWORD — update both places
-        // together if you change the password.
-        // ──────────────────────────────────────────────────────
-        (function() {
-            'use strict';
-            const VALID_USER = 'admin';
-            const VALID_PASS = 'Technopaths2026';
-
-            const form = document.getElementById('loginForm');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
-            const loginBtn = document.getElementById('loginBtn');
-            const btnText = document.getElementById('loginBtnText');
-            const spinner = document.getElementById('loginSpinner');
-            const errorAlert = document.getElementById('loginError');
-            const errorMsg = document.getElementById('loginErrorMessage');
-
-            if (sessionStorage.getItem('tq_logged_in') === 'true') {
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = usernameInput.value.trim();
-                const password = passwordInput.value.trim();
-
-                if (!username || !password) {
-                    showError('Please enter both username and password.');
-                    return;
-                }
-
-                setLoading(true);
-                setTimeout(function() {
-                    if (username === VALID_USER && password === VALID_PASS) {
-                        sessionStorage.setItem('tq_logged_in', 'true');
-                        sessionStorage.setItem('tq_username', username);
-                        sessionStorage.setItem('tq_full_name', 'Administrator');
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        showError('Invalid username or password. Please try again.');
-                        setLoading(false);
-                    }
-                }, 500);
-            });
-
-            function showError(msg) {
-                errorMsg.textContent = msg;
-                errorAlert.classList.remove('d-none');
-                clearTimeout(window._loginErrorTimer);
-                window._loginErrorTimer = setTimeout(function() {
-                    errorAlert.classList.add('d-none');
-                }, 4000);
-            }
-
-            function setLoading(loading) {
-                loginBtn.disabled = loading;
-                btnText.textContent = loading ? 'Signing in…' : 'Sign In';
-                spinner.classList.toggle('d-none', !loading);
-            }
-
-            usernameInput.addEventListener('input', () => errorAlert.classList.add('d-none'));
-            passwordInput.addEventListener('input', () => errorAlert.classList.add('d-none'));
-        })();
-    </script>
+     <!-- Load config first -->
+    <script src="config.example.js"></script>
+    <!-- Load main script with all functionality -->
+    <script src="script.js"></script>
 </body>
 </html>

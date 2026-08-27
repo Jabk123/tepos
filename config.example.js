@@ -12,5 +12,5 @@
 // ──────────────────────────────────────────────────────────────
 window.TQ_CONFIG = {
   // Your deployed Google Apps Script Web App URL, ending in /exec
-  API_BASE: 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec'
+  API_BASE: 'https://script.google.com/macros/s/AKfycby3VnGK2SK6h8Ggll_gsRCCKSoM9Y2-rmjbKe79XqPPX77FrUfm3fdriRu3e0dya1FV/exec'
 };

@@ -13,21 +13,166 @@ if (!API_BASE) {
 }
 
 // ─── AUTH ────────────────────────────────────────────────────
+
+/**
+ * Authenticate user against the Users sheet in the backend
+ * @param {string} username - User's username
+ * @param {string} password - User's password
+ * @returns {Promise<Object>} Authentication result
+ */
+async function authenticateUser(username, password) {
+  try {
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'login',
+        username: username,
+        password: password
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Server responded with status ' + response.status);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { 
+      success: false, 
+      error: 'Network error. Please check your connection and try again.' 
+    };
+  }
+}
+
+/**
+ * Check if user is authenticated, redirect to login if not
+ */
 function checkAuth() {
   if (!sessionStorage.getItem('tq_logged_in')) {
     window.location.href = 'index.html';
-    return;
+    return false;
   }
   const name = sessionStorage.getItem('tq_full_name') || sessionStorage.getItem('tq_username') || 'User';
   document.querySelectorAll('#usernameDisplay').forEach(el => el.textContent = name);
   renderNav();
+  return true;
 }
 
-// ─── NAVIGATION (sidebar on desktop, top bar + bottom tabs on mobile) ──
-// Rendered once from JS so every page shares exactly one nav definition —
-// this also fixes the old bug where dashboard/create-quote/view-quotes/
-// quote-details never loaded bootstrap.bundle.js, so the navbar toggler
-// and modals silently did nothing on mobile.
+/**
+ * Handle login form submission
+ * @param {Event} event - Form submit event
+ */
+async function handleLogin(event) {
+  event.preventDefault();
+  
+  const form = document.getElementById('loginForm');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('loginBtnText');
+  const spinner = document.getElementById('loginSpinner');
+  const errorAlert = document.getElementById('loginError');
+  const errorMsg = document.getElementById('loginErrorMessage');
+
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  // Validate inputs
+  if (!username || !password) {
+    showLoginError('Please enter both username and password.', errorAlert, errorMsg);
+    return;
+  }
+
+  // Show loading state
+  loginBtn.disabled = true;
+  btnText.textContent = 'Signing in…';
+  spinner.classList.remove('d-none');
+  errorAlert.classList.add('d-none');
+
+  try {
+    // Authenticate with backend
+    const result = await authenticateUser(username, password);
+
+    if (result.success) {
+      // Store session data
+      sessionStorage.setItem('tq_logged_in', 'true');
+      sessionStorage.setItem('tq_username', result.username || username);
+      sessionStorage.setItem('tq_full_name', result.fullName || username);
+      sessionStorage.setItem('tq_role', result.role || 'User');
+      
+      // Redirect to dashboard
+      window.location.href = 'dashboard.html';
+    } else {
+      showLoginError(result.error || 'Invalid username or password. Please try again.', errorAlert, errorMsg);
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    showLoginError('An error occurred during login. Please try again.', errorAlert, errorMsg);
+  } finally {
+    // Reset button state
+    loginBtn.disabled = false;
+    btnText.textContent = 'Sign In';
+    spinner.classList.add('d-none');
+  }
+}
+
+/**
+ * Show login error message
+ */
+function showLoginError(message, errorAlert, errorMsg) {
+  errorMsg.textContent = message;
+  errorAlert.classList.remove('d-none');
+  
+  // Auto-hide after 5 seconds
+  clearTimeout(window._loginErrorTimer);
+  window._loginErrorTimer = setTimeout(function() {
+    errorAlert.classList.add('d-none');
+  }, 5000);
+}
+
+/**
+ * Initialize login page
+ */
+function initLogin() {
+  const form = document.getElementById('loginForm');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const errorAlert = document.getElementById('loginError');
+
+  // Check if already logged in
+  if (sessionStorage.getItem('tq_logged_in') === 'true') {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  // Add form submit handler
+  if (form) {
+    form.addEventListener('submit', handleLogin);
+  }
+
+  // Clear errors on input
+  if (usernameInput) {
+    usernameInput.addEventListener('input', () => errorAlert?.classList.add('d-none'));
+  }
+  if (passwordInput) {
+    passwordInput.addEventListener('input', () => errorAlert?.classList.add('d-none'));
+  }
+
+  // Enter key support on password field
+  if (passwordInput) {
+    passwordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        form?.dispatchEvent(new Event('submit'));
+      }
+    });
+  }
+}
+
+// ─── NAVIGATION ─────────────────────────────────────────────
+
 function renderNav() {
   const mount = document.getElementById('tqNav');
   if (!mount) return;
@@ -63,7 +208,7 @@ function renderNav() {
       <div class="tq-sidebar-footer">
         <div class="tq-user">
           <div class="tq-user-avatar">${initial}</div>
-          <div><div class="tq-user-name">${name}</div><div class="tq-user-role">Administrator</div></div>
+          <div><div class="tq-user-name">${name}</div><div class="tq-user-role">${sessionStorage.getItem('tq_role') || 'User'}</div></div>
         </div>
         <a href="#" class="tq-logout-link" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </div>
@@ -85,7 +230,7 @@ document.addEventListener('click', function (e) {
   }
 });
 
-// ─── TOAST NOTIFICATIONS (replaces alert() for a more professional feel) ──
+// ─── TOAST NOTIFICATIONS ──────────────────────────────────
 function ensureToastContainer() {
   let c = document.getElementById('tqToastContainer');
   if (!c) {
@@ -112,13 +257,13 @@ function showToast(message, type = 'danger') {
   }, 4000);
 }
 
-// ─── CURRENCY (South African Rand) ─────────────────────────────
+// ─── CURRENCY ─────────────────────────────────────────────
 function formatCurrency(value) {
   const n = parseFloat(value) || 0;
   return 'R' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ─── API HELPERS ────────────────────────────────────────────
+// ─── API HELPERS ──────────────────────────────────────────
 async function apiGet(action, params = {}) {
   const url = new URL(API_BASE);
   url.searchParams.append('action', action);
@@ -131,12 +276,6 @@ async function apiGet(action, params = {}) {
 }
 
 async function apiPost(action, data) {
-  // IMPORTANT: Apps Script web apps do not handle CORS preflight (OPTIONS)
-  // requests. Sending "Content-Type: application/json" forces the browser
-  // to send a preflight, which gets blocked and shows up as a generic
-  // "network error". Using "text/plain" keeps this a "simple request" that
-  // skips preflight entirely — Apps Script still reads the raw JSON body
-  // fine via e.postData.contents.
   const res = await fetch(API_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -146,8 +285,10 @@ async function apiPost(action, data) {
   return res.json();
 }
 
-// ─── DASHBOARD ──────────────────────────────────────────────
+// ─── DASHBOARD ────────────────────────────────────────────
 async function loadDashboard() {
+  if (!checkAuth()) return;
+  
   try {
     const stats = await apiGet('getDashboardStats');
     document.getElementById('totalQuotes').textContent = stats.totalQuotes || 0;
@@ -179,8 +320,10 @@ async function loadDashboard() {
   }
 }
 
-// ─── CREATE QUOTE ───────────────────────────────────────────
+// ─── CREATE QUOTE ─────────────────────────────────────────
 function initCreateQuote() {
+  if (!checkAuth()) return;
+  
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('dateCreated').value = today;
   const expiry = new Date();
@@ -319,9 +462,6 @@ async function saveQuote() {
   const textEl = document.getElementById('saveBtnText');
   const spinner = document.getElementById('saveSpinner');
 
-  // Remember the original markup so we restore it exactly (icon included)
-  // rather than clobbering it with plain text — that HTML-tags-showing-up
-  // bug came from setting .textContent to a string containing an <i> tag.
   const originalMarkup = textEl.innerHTML;
 
   btn.disabled = true;
@@ -390,12 +530,14 @@ function previewQuote() {
   new bootstrap.Modal(document.getElementById('previewModal')).show();
 }
 
-// ─── VIEW QUOTES ─────────────────────────────────────────────
+// ─── VIEW QUOTES ─────────────────────────────────────────
 let allQuotes = [];
 let currentPage = 1;
 const perPage = 10;
 
 async function initViewQuotes() {
+  if (!checkAuth()) return;
+  
   await loadQuotes();
   document.getElementById('searchInput').addEventListener('input', filterQuotes);
   document.getElementById('statusFilter').addEventListener('change', filterQuotes);
@@ -515,8 +657,10 @@ function exportCsv() {
   URL.revokeObjectURL(url);
 }
 
-// ─── QUOTE DETAILS ───────────────────────────────────────────
+// ─── QUOTE DETAILS ────────────────────────────────────────
 async function initQuoteDetails() {
+  if (!checkAuth()) return;
+  
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
   if (!id) {
@@ -533,7 +677,11 @@ async function initQuoteDetails() {
     document.getElementById('printBtn').addEventListener('click', () => window.print());
     document.getElementById('pdfBtn').addEventListener('click', function () {
       const element = document.getElementById('quoteDisplay');
-      html2pdf().from(element).save(`quote-${quote['Quote Number']}.pdf`);
+      if (typeof html2pdf !== 'undefined') {
+        html2pdf().from(element).save(`quote-${quote['Quote Number']}.pdf`);
+      } else {
+        showToast('PDF library not loaded. Please check your internet connection.', 'warning');
+      }
     });
     document.getElementById('backBtn').addEventListener('click', () => window.history.back());
   } catch (err) {
@@ -584,3 +732,23 @@ function renderQuoteDetails(q) {
   `;
   document.getElementById('quoteDisplay').innerHTML = html;
 }
+
+// ─── AUTO-INIT ─────────────────────────────────────────────
+// Initialize login page if we're on the login page
+if (document.getElementById('loginForm')) {
+  initLogin();
+}
+
+// Initialize page based on body data-page attribute
+document.addEventListener('DOMContentLoaded', function() {
+  const page = document.body.dataset.page;
+  if (page === 'dashboard' && typeof loadDashboard === 'function') {
+    loadDashboard();
+  } else if (page === 'create' && typeof initCreateQuote === 'function') {
+    initCreateQuote();
+  } else if (page === 'view' && typeof initViewQuotes === 'function') {
+    initViewQuotes();
+  } else if (page === 'details' && typeof initQuoteDetails === 'function') {
+    initQuoteDetails();
+  }
+});
